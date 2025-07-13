@@ -1,0 +1,77 @@
+Write a python class which is same as scikit-learn class of min-max scaling. Here
+scale = log10(minimum)
+All numbers will be transformed using:
+x_transformed = x/ (10**scale)
+Similarly it will have a reverse transformer as well:
+x = x_transformed * (10**scale)
+
+
+Response:
+Here's a Python class that mimics the interface and behavior of scikit-learn's MinMaxScaler, but with your custom scaling rule:
+
+It computes scale = log10(minimum) during fitting.
+
+Transforms data using:
+
+𝑥
+transformed
+=
+𝑥
+10
+scale
+x 
+transformed
+​
+ = 
+10 
+scale
+ 
+x
+​
+ 
+Inversely transforms using:
+
+𝑥
+=
+𝑥
+transformed
+⋅
+10
+scale
+x=x 
+transformed
+​
+ ⋅10 
+scale
+
+
+import numpy as np
+from math import log10
+
+class LogMinScaler:
+    def __init__(self):
+        self.scale_ = None
+        self.min_ = None
+
+    def fit(self, X):
+        X = np.asarray(X)
+        if np.any(X <= 0):
+            raise ValueError("All values must be strictly positive to compute log10.")
+        self.min_ = np.min(X)
+        self.scale_ = log10(self.min_)
+        return self
+
+    def transform(self, X):
+        if self.scale_ is None:
+            raise RuntimeError("You must fit the scaler before transforming data.")
+        X = np.asarray(X)
+        return X / (10 ** self.scale_)
+
+    def inverse_transform(self, X_transformed):
+        if self.scale_ is None:
+            raise RuntimeError("You must fit the scaler before inverse transforming data.")
+        X_transformed = np.asarray(X_transformed)
+        return X_transformed * (10 ** self.scale_)
+
+    def fit_transform(self, X):
+        return self.fit(X).transform(X)
